@@ -31,7 +31,7 @@ namespace PMT_API.Controllers
         {
             if (IsWordInBlacklist(inputString))
             {
-                return BadRequest($"Была введена не подходящая строка: {inputString}");
+                return BadRequest($"ГЃГ»Г«Г  ГўГўГҐГ¤ГҐГ­Г  Г­ГҐ ГЇГ®Г¤ГµГ®Г¤ГїГ№Г Гї Г±ГІГ°Г®ГЄГ : {inputString}");
             }
 
             try
@@ -74,7 +74,7 @@ namespace PMT_API.Controllers
                 }
                 else
                 {
-                    return BadRequest("Были введены не подходящие символы: " + GetInvalidCharacters(input: inputString));
+                    return BadRequest("ГЃГ»Г«ГЁ ГўГўГҐГ¤ГҐГ­Г» Г­ГҐ ГЇГ®Г¤ГµГ®Г¤ГїГ№ГЁГҐ Г±ГЁГ¬ГўГ®Г«Г»: " + GetInvalidCharacters(input: inputString));
                 }
             }
             catch (Exception ex)
@@ -97,7 +97,7 @@ namespace PMT_API.Controllers
             {
                 using (HttpClient client = new())
                 {
-                    var number = _configuration.GetSection("RemoteApiUrl").Get<List<string>>();
+                    var number = _configuration.GetSection("RandomAPI").Get<List<string>>();
                     string apiUrl = number[0] + lenMax.ToString() + number[2];
                     HttpResponseMessage response = await client.GetAsync(apiUrl);
                     if (response.IsSuccessStatusCode)
@@ -108,7 +108,7 @@ namespace PMT_API.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Ошибка при обращении к удаленному API: {ex.Message}");
+                Console.WriteLine($"ГЋГёГЁГЎГЄГ  ГЇГ°ГЁ Г®ГЎГ°Г Г№ГҐГ­ГЁГЁ ГЄ ГіГ¤Г Г«ГҐГ­Г­Г®Г¬Гі API: {ex.Message}");
             }
 
             Random random = new();
@@ -149,7 +149,7 @@ namespace PMT_API.Controllers
             foreach (var baseCharacter in input.Distinct().ToArray())
             {
                 var count = input.Count(character => character == baseCharacter);
-                characters.Add(("Количество символов " + baseCharacter.ToString() + " в обработанной строке = " + count.ToString()));
+                characters.Add(("ГЉГ®Г«ГЁГ·ГҐГ±ГІГўГ® Г±ГЁГ¬ГўГ®Г«Г®Гў " + baseCharacter.ToString() + " Гў Г®ГЎГ°Г ГЎГ®ГІГ Г­Г­Г®Г© Г±ГІГ°Г®ГЄГҐ = " + count.ToString()));
             }
             return characters;
         }
