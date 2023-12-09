@@ -31,7 +31,7 @@ namespace PMT_API.Controllers
         {
             if (IsWordInBlacklist(inputString))
             {
-                return BadRequest($"Áûëà ââåäåíà íå ïîäõîäÿùàÿ ñòðîêà: {inputString}");
+                return BadRequest($"Была введена не подходящая строка: {inputString}");
             }
 
             try
@@ -74,7 +74,7 @@ namespace PMT_API.Controllers
                 }
                 else
                 {
-                    return BadRequest("Áûëè ââåäåíû íå ïîäõîäÿùèå ñèìâîëû: " + GetInvalidCharacters(input: inputString));
+                    return BadRequest("Были введены не подходящие символы: " + GetInvalidCharacters(input: inputString));
                 }
             }
             catch (Exception ex)
@@ -108,7 +108,7 @@ namespace PMT_API.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Îøèáêà ïðè îáðàùåíèè ê óäàëåííîìó API: {ex.Message}");
+                Console.WriteLine($"Ошибка при обращении к удаленному API: {ex.Message}");
             }
 
             Random random = new();
@@ -149,7 +149,7 @@ namespace PMT_API.Controllers
             foreach (var baseCharacter in input.Distinct().ToArray())
             {
                 var count = input.Count(character => character == baseCharacter);
-                characters.Add(("Êîëè÷åñòâî ñèìâîëîâ " + baseCharacter.ToString() + " â îáðàáîòàííîé ñòðîêå = " + count.ToString()));
+                characters.Add(("Количество символов " + baseCharacter.ToString() + " в обработанной строке = " + count.ToString()));
             }
             return characters;
         }
