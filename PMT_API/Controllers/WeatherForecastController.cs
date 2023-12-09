@@ -86,7 +86,7 @@ namespace PMT_API.Controllers
 
         private bool IsWordInBlacklist(string word)
         {
-            var blacklist = _configuration.GetSection("Blacklist").Get<List<string>>();
+            var blacklist = _configuration.GetSection("Settings").GetSection("Blacklist").Get<List<string>>();
             return blacklist != null && blacklist.Contains(word.ToLower());
         }
 
@@ -99,9 +99,7 @@ namespace PMT_API.Controllers
                 {
                     var number = _configuration.GetSection("RemoteApiUrl").Get<List<string>>();
                     string apiUrl = number[0] + lenMax.ToString() + number[2];
-                    Console.WriteLine(apiUrl);
                     HttpResponseMessage response = await client.GetAsync(apiUrl);
-
                     if (response.IsSuccessStatusCode)
                     {
                         return await response.Content.ReadAsStringAsync();
