@@ -3,23 +3,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Reflection.PortableExecutable;
 using System.Text.RegularExpressions;
-using Microsoft.Extensions.Configuration;
 
 namespace PMT_API.Controllers
 {
-
     [ApiController]
     [Route("[controller]")]
     public class WeatherForecastController : ControllerBase
     {
-
-        private readonly IConfiguration _configuration;
-
-        public WeatherForecastController(IConfiguration configuration)
-        {
-            _configuration = configuration;
-        }
-
         public enum SortingAlgorithm
         {
             Option1 = 1,
@@ -29,11 +19,6 @@ namespace PMT_API.Controllers
         [HttpGet]
         public ActionResult<string> ProcessStringAction(string inputString, SortingAlgorithm choiceAlgorithm)
         {
-            if (IsWordInBlacklist(inputString))
-            {
-                return BadRequest($"Была введена не подходящая строка: {inputString}");
-            }
-
             try
             {
                 if (Regex.IsMatch(input: inputString, "^[a-z]*$"))
@@ -84,22 +69,14 @@ namespace PMT_API.Controllers
 
         }
 
-        private bool IsWordInBlacklist(string word)
-        {
-            var blacklist = _configuration.GetSection("Blacklist").Get<List<string>>();
-            return blacklist != null && blacklist.Contains(word.ToLower());
-        }
-
-        private async Task<string> GetRandomNumber(int lenMax)
+        static async Task<string> GetRandomNumber(int lenMax)
         {
             lenMax -= 1;
             try
             {
                 using (HttpClient client = new())
                 {
-                    var number = _configuration.GetSection("RemoteApiUrl").Get<List<string>>();
-                    string apiUrl = number[0] + lenMax.ToString() + number[2];
-                    Console.WriteLine(apiUrl);
+                    string apiUrl = "https://www.random.org/integers/?num=1&min=0&max=" + lenMax.ToString() + "&col=1&base=10&format=plain&rnd=new";
                     HttpResponseMessage response = await client.GetAsync(apiUrl);
 
                     if (response.IsSuccessStatusCode)
