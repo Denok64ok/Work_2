@@ -1,9 +1,5 @@
-using Microsoft.AspNetCore.Cors.Infrastructure;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Reflection.PortableExecutable;
 using System.Text.RegularExpressions;
-using Microsoft.Extensions.Configuration;
 
 namespace PMT_API.Controllers
 {
@@ -12,12 +8,14 @@ namespace PMT_API.Controllers
     [Route("[controller]")]
     public class WeatherForecastController : ControllerBase
     {
-
         private readonly IConfiguration _configuration;
+        private readonly SemaphoreSlim _semaphore;
 
         public WeatherForecastController(IConfiguration configuration)
         {
             _configuration = configuration;
+            int parallelLimit = _configuration.GetValue<int>("Settings:ParallelLimit");
+            _semaphore = new SemaphoreSlim(parallelLimit, parallelLimit);
         }
 
         public enum SortingAlgorithm
@@ -27,13 +25,16 @@ namespace PMT_API.Controllers
         }
 
         [HttpGet]
-        public ActionResult<string> ProcessStringAction(string inputString, SortingAlgorithm choiceAlgorithm)
+        public async Task<ActionResult<string>> ProcessStringAction(string inputString, SortingAlgorithm choiceAlgorithm)
         {
+
+            await _semaphore.WaitAsync();
+
             if (IsWordInBlacklist(inputString))
             {
                 return BadRequest($"Была введена не подходящая строка: {inputString}");
             }
-
+            
             try
             {
                 if (Regex.IsMatch(input: inputString, "^[a-z]*$"))
@@ -58,7 +59,7 @@ namespace PMT_API.Controllers
                         sortResult = result.ToCharArray();
                         sortAlgorithm.Sort(sortResult);
                     }
-
+                    
                     int randomPosition = int.Parse(GetRandomNumber(result.Length).Result);
 
                     var responseObject = new
@@ -71,6 +72,7 @@ namespace PMT_API.Controllers
                     };
 
                     return Ok(responseObject);
+                    
                 }
                 else
                 {
@@ -79,9 +81,13 @@ namespace PMT_API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { ErrorMessage = ex.Message });
+                Console.WriteLine($"Exception: {ex}");
+                return StatusCode(503, new { ErrorMessage = "Service Unavailable" });
             }
-
+            finally
+            {
+                _semaphore.Release();
+            }
         }
 
         private bool IsWordInBlacklist(string word)
